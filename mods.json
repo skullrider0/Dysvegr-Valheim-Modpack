@@ -5,7 +5,7 @@
   "created": "2026-10-18",
   "counts": {
     "framework": 1,
-    "server": 30,
+    "server": 32,
     "client": 11
   },
   "mods": [
@@ -119,7 +119,7 @@
     },
     {
       "package_id": "Vapok-AdventureBackpacks",
-      "version": "2.4.4",
+      "version": "2.4.5",
       "mode": "server",
       "enabled": true
     },
@@ -181,12 +181,6 @@
       "package_id": "blacks7ar-OreMines",
       "version": "1.2.1",
       "mode": "server",
-      "enabled": true
-    },
-    {
-      "package_id": "cybrp-ItemDrawers",
-      "version": "1.2.6",
-      "mode": "client",
       "enabled": true
     },
     {
@@ -260,7 +254,26 @@
       "version": "1.2.1",
       "mode": "client",
       "enabled": true
+    },
+    {
+      "package_id": "VegettaPT-No_Food_Degradation",
+      "version": "1.0.0",
+      "mode": "server",
+      "enabled": true
+    },
+    {
+      "package_id": "FF15Vikings-VikingQoL",
+      "version": "1.4.0",
+      "mode": "server",
+      "enabled": true
+    },
+    {
+      "package_id": "Landoria-FirstPerson",
+      "version": "1.0.16",
+      "mode": "client",
+      "enabled": true
     }
   ],
-  "notes": "ItemDrawers remains enabled in the original client profile but is excluded from dedicated-server installs due to repeat TypeLoadException on the Valheim 1.0 server; quarantine the existing server DLL before reinstalling."
+  "notes": "Synced with Mods_1792350318316.r2z. ItemDrawers 1.2.6 removed from current profile and deliberately not installed on server due to previous TypeLoadException; previously quarantined server DLL remains outside BepInEx. Landoria FirstPerson is client-only. VikingQoL 1.4.0 requires matching version for all joining players.",
+  "source_profile_name": "Mods"
 }
