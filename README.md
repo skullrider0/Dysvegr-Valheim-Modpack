@@ -2,17 +2,18 @@
 
 Version-pinned Thunderstore modpack for an **ich777 Valheim Docker server on Unraid**, assembled from the uploaded Thunderstore/r2modman profile.
 
-- 44 enabled packages in the latest Thunderstore export (October 18, 2026)
-- 32 server-selected packages; 11 client-side packages; BepInEx framework provided by ich777
+- 44 enabled packages in the uploaded Thunderstore export; **43** in the conflict-resolved modpack
+- 31 server-selected packages; 11 client-side packages; BepInEx framework provided by ich777
 - Package versions in [mods.tsv](mods.tsv)
 - The script **downloads mod ZIPs directly from Thunderstore**; it doesn't redistribute mod DLLs.
 
 ## October 18, 2026 modpack update
 
-Rebuilt the pinned manifest and client profile from `Mods_1792350318316.r2z`, which contains **44 enabled packages**:
+Rebuilt the pinned manifest and client profile from `Mods_1792350318316.r2z`, which contains **44 enabled packages**. The compatible distribution has **43** because VikingQoL replaces MultiUserChest:
 
 - Added `VegettaPT-No_Food_Degradation-1.0.0` to server.
 - Added `FF15Vikings-VikingQoL-1.4.0` to server (**server and all players must run the same version**).
+- Removed `MSchmoecker-MultiUserChest-0.6.2` from both server and client manifests because VikingQoL refuses to coexist with it. The installer moves any installed server copy to `Dysvegr-disabled-plugins/` **after backup**. Every player must also remove or disable MultiUserChest locally.
 - Added `Landoria-FirstPerson-1.0.16` to the client profile only.
 - Upgraded `Vapok-AdventureBackpacks` from 2.4.4 to 2.4.5.
 - Removed `cybrp-ItemDrawers-1.2.6` from both profiles; its prior quarantined server copy stays untouched.
@@ -24,6 +25,20 @@ VikingQoL defaults to larger item stacks and provides storage and crafting utili
 ```bash
 cd /mnt/user/appdata/Dysvegr-Valheim-Modpack && git pull --ff-only && bash install-unraid.sh --mods-only
 ```
+
+## VikingQoL / MultiUserChest compatibility fix (October 18)
+
+The server log reported:
+
+`[Error : VikingQoL] com.maxsch.valheim.MultiUserChest is installed and conflicts with VikingQoL: remove one of them (from the server and every player).`
+
+**Resolution:** Keep VikingQoL 1.4.0 and remove MultiUserChest, which VikingQoL supersedes with shared-chest support. The repo's server and client manifests now omit MultiUserChest. After a successful BepInEx backup, `install-unraid.sh` quarantines the previous `BepInEx/plugins/MSchmoecker-MultiUserChest` directory outside the BepInEx tree. It does not delete the mod or your world data.
+
+```bash
+cd /mnt/user/appdata/Dysvegr-Valheim-Modpack && git pull --ff-only && bash install-unraid.sh --mods-only
+```
+
+Each player must update their Thunderstore/r2modman profile and **disable or uninstall MultiUserChest** before joining. VikingQoL 1.4.0 must be present on the server and all clients. The original uploaded `.r2z` is unchanged; `client-profile.yml` in GitHub reflects the corrected 43-package profile.
 
 ## Server setup
 
