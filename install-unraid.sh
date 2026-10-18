@@ -169,15 +169,15 @@ while IFS=$'\t' read -r package version mode; do
   else
     target="$DEST_PLUGINS/$package"
     mkdir -p "$target"
-    find "$folder" -maxdepth 1 -type f \
+    # Many Thunderstore packages (including BetterArchery) store their DLL
+    # inside a nested directory rather than at the ZIP root. Preserve those
+    # directories; BepInEx recursively scans plugins for DLLs.
+    find "$folder" -mindepth 1 -maxdepth 1 \
       ! -name manifest.json ! -name icon.png \
       ! -iname 'readme*' ! -iname 'changelog*' ! -iname 'license*' \
       -exec cp -a -t "$target" {} +
-    for sub in Assets assets Resources resources; do
-      if [[ -d "$folder/$sub" ]]; then cp -a "$folder/$sub" "$target/"; fi
-    done
     if ! find "$target" -type f \( -iname '*.dll' -o -iname '*.so' \) -print -quit | grep -q .; then
-      echo "[Dysvegr] WARNING: no normal plugin binary detected for $package" >&2
+      echo "[Dysvegr] WARNING: no plugin binary detected anywhere in $package" >&2
     fi
   fi
   if [[ -d "$folder/BepInEx/patchers" ]]; then
