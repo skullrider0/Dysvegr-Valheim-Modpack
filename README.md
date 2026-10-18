@@ -3,7 +3,7 @@
 Version-pinned Thunderstore modpack for an **ich777 Valheim Docker server on Unraid**, assembled from the uploaded Thunderstore/r2modman profile.
 
 - 42 enabled packages in the source profile
-- 31 server-selected packages; 10 client-only candidates; BepInEx framework provided by ich777
+- 30 server-selected packages; 11 client-side/held-back packages; BepInEx framework provided by ich777
 - Package versions in [mods.tsv](mods.tsv)
 - The script **downloads mod ZIPs directly from Thunderstore**; it doesn't redistribute mod DLLs.
 
@@ -24,6 +24,23 @@ Version-pinned Thunderstore modpack for an **ich777 Valheim Docker server on Unr
    ```
 
    If your Docker container is not named `Valheim`, run with e.g. `CONTAINER=MyValheim bash ...`.
+
+
+## ItemDrawers compatibility warning (Valheim 1.0)
+
+The original Thunderstore profile includes \`cybrp-ItemDrawers-1.2.6\`, but on this dedicated server BepInEx produced over 16,000 \`TypeLoadException: VTable setup of type kg_ItemDrawers.DrawerComponent failed\` errors shortly after the first scene started. Only one ItemDrawers DLL was detected. Thunderstore categorizes the package as *client-side*, but also documents dedicated-server synchronization, so compatibility remains uncertain.
+
+The package remains in the original client profile and is now skipped by default in \`mods.tsv\`. **Updating Git does not remove files previously installed on the server.** To reversibly quarantine only the existing server copy:
+
+\`\`\`bash
+docker stop -t 120 Valheim
+GAME=/mnt/cache/appdata/valheim
+mkdir -p "$GAME/Dysvegr-disabled-plugins"
+mv "$GAME/BepInEx/plugins/cybrp-ItemDrawers" "$GAME/Dysvegr-disabled-plugins/"
+docker start Valheim
+\`\`\`
+
+Adjust \`GAME\` if your ich777 bind mount differs (the installer prints the real source). Do **not** use a live world containing placed ItemDrawers after disabling the plugin until you've made and verified a world backup; removing modded pieces can lead to missing objects or inaccessible stored items. Moving the folder is reversible; no DLL or config is deleted. The next \`--mods-only\` install will not put ItemDrawers back on the server.
 
 ## Updates
 
