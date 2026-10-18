@@ -148,6 +148,24 @@ fi
 
 BACKUP_DIR="$(dirname "$GAME_DIR")/Dysvegr-modpack-backups"
 mkdir -p "$BACKUP_DIR"
+# Protect active world data whenever changing gameplay-affecting mods.
+# This runs only after Valheim has stopped, avoiding a torn world snapshot.
+WORLD_ROOT="$GAME_DIR/.config/unity3d/IronGate/Valheim/worlds_local"
+if [[ ! -d "$WORLD_ROOT" ]]; then
+  WORLD_ROOT="$(dirname "$GAME_DIR")/.config/unity3d/IronGate/Valheim/worlds_local"
+fi
+if [[ -d "$WORLD_ROOT" ]]; then
+  WORLD_BACKUP="$BACKUP_DIR/worlds_local-before-mod-update-$(date -u +%Y%m%dT%H%M%SZ).tar.gz"
+  echo "[Dysvegr] Backing up world saves to $WORLD_BACKUP"
+  tar -czf "$WORLD_BACKUP" -C "$WORLD_ROOT" .
+  tar -tzf "$WORLD_BACKUP" >/dev/null || {
+    echo "World backup validation failed; refusing to change mods!" >&2
+    exit 1
+  }
+  echo '[Dysvegr] World backup verified'
+else
+  echo '[Dysvegr] WARNING: worlds_local not found at the usual ich777 path; mod files will still be backed up.'
+fi
 BACKUP="$BACKUP_DIR/Valheim-BepInEx-before-Dysvegr-$(date -u +%Y%m%dT%H%M%SZ).tar.gz"
 tar -czf "$BACKUP" -C "$GAME_DIR" BepInEx
 echo "[Dysvegr] BepInEx backup saved at $BACKUP"
