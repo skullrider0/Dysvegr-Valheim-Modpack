@@ -2,10 +2,28 @@
 
 Version-pinned Thunderstore modpack for an **ich777 Valheim Docker server on Unraid**, assembled from the uploaded Thunderstore/r2modman profile.
 
-- 42 enabled packages in the source profile
-- 30 server-selected packages; 11 client-side/held-back packages; BepInEx framework provided by ich777
+- 44 enabled packages in the latest Thunderstore export (October 18, 2026)
+- 32 server-selected packages; 11 client-side packages; BepInEx framework provided by ich777
 - Package versions in [mods.tsv](mods.tsv)
 - The script **downloads mod ZIPs directly from Thunderstore**; it doesn't redistribute mod DLLs.
+
+## October 18, 2026 modpack update
+
+Rebuilt the pinned manifest and client profile from `Mods_1792350318316.r2z`, which contains **44 enabled packages**:
+
+- Added `VegettaPT-No_Food_Degradation-1.0.0` to server.
+- Added `FF15Vikings-VikingQoL-1.4.0` to server (**server and all players must run the same version**).
+- Added `Landoria-FirstPerson-1.0.16` to the client profile only.
+- Upgraded `Vapok-AdventureBackpacks` from 2.4.4 to 2.4.5.
+- Removed `cybrp-ItemDrawers-1.2.6` from both profiles; its prior quarantined server copy stays untouched.
+
+VikingQoL defaults to larger item stacks and provides storage and crafting utilities that may overlap other enabled mods. Back up world saves and player characters before updating. The installer now backs up the world saves (where discoverable) after stopping the server, in addition to BepInEx. The user's exported `.r2z` configs are **not** automatically applied; newly installed mods will generate default configs on initial launch. Review `BepInEx/config/ff15vikings.vikingqol.cfg` on the server after first launch. Mod compatibility is not guaranteed.
+
+**To update the server:**
+
+```bash
+cd /mnt/user/appdata/Dysvegr-Valheim-Modpack && git pull --ff-only && bash install-unraid.sh --mods-only
+```
 
 ## Server setup
 
@@ -28,9 +46,9 @@ Version-pinned Thunderstore modpack for an **ich777 Valheim Docker server on Unr
 
 ## ItemDrawers compatibility warning (Valheim 1.0)
 
-The original Thunderstore profile includes `cybrp-ItemDrawers-1.2.6`, but on this dedicated server BepInEx produced over 16,000 `TypeLoadException: VTable setup of type kg_ItemDrawers.DrawerComponent failed` errors shortly after the first scene started. Only one ItemDrawers DLL was detected. Thunderstore categorizes the package as *client-side*, but also documents dedicated-server synchronization, so compatibility remains uncertain.
+The earlier Thunderstore profile included `cybrp-ItemDrawers-1.2.6` (removed in the newest export), but on this dedicated server BepInEx produced over 16,000 `TypeLoadException: VTable setup of type kg_ItemDrawers.DrawerComponent failed` errors shortly after the first scene started. Only one ItemDrawers DLL was detected. Thunderstore categorizes the package as *client-side*, but also documents dedicated-server synchronization, so compatibility remains uncertain.
 
-The package remains in the original client profile and is now skipped by default in `mods.tsv`. **Updating Git does not remove files previously installed on the server.** To reversibly quarantine only the existing server copy:
+The package is absent from the new client profile and server manifest; it remains disabled on the server.  **Updating Git does not remove files previously installed on the server.** To reversibly quarantine only the existing server copy:
 
 ```bash
 docker stop -t 120 Valheim
