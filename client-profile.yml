@@ -204,12 +204,6 @@ mods:
       minor: 13
       patch: 0
     enabled: true
-  - name: MSchmoecker-MultiUserChest
-    version:
-      major: 0
-      minor: 6
-      patch: 2
-    enabled: true
   - name: Nextek-SpeedyPaths
     version:
       major: 1
