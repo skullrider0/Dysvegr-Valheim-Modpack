@@ -170,6 +170,22 @@ BACKUP="$BACKUP_DIR/Valheim-BepInEx-before-Dysvegr-$(date -u +%Y%m%dT%H%M%SZ).ta
 tar -czf "$BACKUP" -C "$GAME_DIR" BepInEx
 echo "[Dysvegr] BepInEx backup saved at $BACKUP"
 
+# VikingQoL 1.4.0 explicitly conflicts with MultiUserChest 0.6.2.
+# The installer does not otherwise remove packages omitted from its manifest,
+# so move the old installed plugin OUTSIDE BepInEx after creating backups.
+if grep -q '^FF15Vikings-VikingQoL[[:space:]]' "$MANIFEST"; then
+  OLD_MULTI="$GAME_DIR/BepInEx/plugins/MSchmoecker-MultiUserChest"
+  if [[ -d "$OLD_MULTI" ]]; then
+    DISABLED="$GAME_DIR/Dysvegr-disabled-plugins"
+    mkdir -p "$DISABLED"
+    QUARANTINED="$DISABLED/MSchmoecker-MultiUserChest-$(date -u +%Y%m%dT%H%M%SZ)"
+    [[ ! -e "$QUARANTINED" ]] || { echo "Quarantine destination exists: $QUARANTINED" >&2; exit 1; }
+    mv "$OLD_MULTI" "$QUARANTINED"
+    echo "[Dysvegr] Quarantined conflicting MultiUserChest plugin: $QUARANTINED"
+    echo '[Dysvegr] Every client must remove/disable MultiUserChest when using VikingQoL.'
+  fi
+fi
+
 DEST_PLUGINS="$GAME_DIR/BepInEx/plugins"
 DEST_PATCHERS="$GAME_DIR/BepInEx/patchers"
 DEST_CONFIG="$GAME_DIR/BepInEx/config"
