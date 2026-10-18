@@ -112,7 +112,7 @@ mods:
     version:
       major: 2
       minor: 4
-      patch: 4
+      patch: 5
     enabled: true
   - name: Therzie-Monstrum
     version:
@@ -173,12 +173,6 @@ mods:
       major: 1
       minor: 2
       patch: 1
-    enabled: true
-  - name: cybrp-ItemDrawers
-    version:
-      major: 1
-      minor: 2
-      patch: 6
     enabled: true
   - name: MidnightMods-AchievementEnabler
     version:
@@ -251,4 +245,22 @@ mods:
       major: 1
       minor: 2
       patch: 1
+    enabled: true
+  - name: VegettaPT-No_Food_Degradation
+    version:
+      major: 1
+      minor: 0
+      patch: 0
+    enabled: true
+  - name: FF15Vikings-VikingQoL
+    version:
+      major: 1
+      minor: 4
+      patch: 0
+    enabled: true
+  - name: Landoria-FirstPerson
+    version:
+      major: 1
+      minor: 0
+      patch: 16
     enabled: true
