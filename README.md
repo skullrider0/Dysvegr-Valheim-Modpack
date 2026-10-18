@@ -3,7 +3,7 @@
 Version-pinned Thunderstore modpack for an **ich777 Valheim Docker server on Unraid**, assembled from the uploaded Thunderstore/r2modman profile.
 
 - 44 enabled packages in the uploaded Thunderstore export; **43** in the conflict-resolved modpack
-- 31 server-selected packages; 11 client-side packages; BepInEx framework provided by ich777
+- 30 server-selected packages; 12 client-side packages; BepInEx framework provided by ich777
 - Package versions in [mods.tsv](mods.tsv)
 - The script **downloads mod ZIPs directly from Thunderstore**; it doesn't redistribute mod DLLs.
 
@@ -11,7 +11,7 @@ Version-pinned Thunderstore modpack for an **ich777 Valheim Docker server on Unr
 
 Rebuilt the pinned manifest and client profile from `Mods_1792350318316.r2z`, which contains **44 enabled packages**. The compatible distribution has **43** because VikingQoL replaces MultiUserChest:
 
-- Added `VegettaPT-No_Food_Degradation-1.0.0` to server.
+- Added `VegettaPT-No_Food_Degradation-1.0.0` to the client profile only (BepInEx filters out dedicated-server processes).
 - Added `FF15Vikings-VikingQoL-1.4.0` to server (**server and all players must run the same version**).
 - Removed `MSchmoecker-MultiUserChest-0.6.2` from both server and client manifests because VikingQoL refuses to coexist with it. The installer moves any installed server copy to `Dysvegr-disabled-plugins/` **after backup**. Every player must also remove or disable MultiUserChest locally.
 - Added `Landoria-FirstPerson-1.0.16` to the client profile only.
@@ -25,6 +25,10 @@ VikingQoL defaults to larger item stacks and provides storage and crafting utili
 ```bash
 cd /mnt/user/appdata/Dysvegr-Valheim-Modpack && git pull --ff-only && bash install-unraid.sh --mods-only
 ```
+
+## Post-update server log verification
+
+Latest startup logs confirm VikingQoL 1.4.0 loads successfully as a dedicated-server plugin, with no remaining MultiUserChest conflict. BepInEx skips **No Food Degradation 1.0.0** due to its `valheim.exe` executable filter. It is now client-only in `mods.tsv`; an already-installed copy on the server may still be present but is skipped automatically. Duplicate language-key warnings in Therzie's Warfare, Armory, Monstrum and Wizardry translations are not themselves fatal errors. Investigate game-world loading separately if no `ZNet.LoadWorld` or `Opened Steam server` line appears in the current log.
 
 ## VikingQoL / MultiUserChest compatibility fix (October 18)
 
