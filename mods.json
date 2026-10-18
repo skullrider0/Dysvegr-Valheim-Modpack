@@ -5,8 +5,8 @@
   "created": "2026-10-18",
   "counts": {
     "framework": 1,
-    "server": 31,
-    "client": 10
+    "server": 30,
+    "client": 11
   },
   "mods": [
     {
@@ -186,7 +186,7 @@
     {
       "package_id": "cybrp-ItemDrawers",
       "version": "1.2.6",
-      "mode": "server",
+      "mode": "client",
       "enabled": true
     },
     {
@@ -261,5 +261,6 @@
       "mode": "client",
       "enabled": true
     }
-  ]
+  ],
+  "notes": "ItemDrawers remains enabled in the original client profile but is excluded from dedicated-server installs due to repeat TypeLoadException on the Valheim 1.0 server; quarantine the existing server DLL before reinstalling."
 }
