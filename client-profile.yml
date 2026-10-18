@@ -1,0 +1,254 @@
+profileName: Dysvegr
+mods:
+  - name: denikson-BepInExPack_Valheim
+    version:
+      major: 5
+      minor: 4
+      patch: 2351
+    enabled: true
+  - name: Advize-PlantEverything
+    version:
+      major: 1
+      minor: 21
+      patch: 3
+    enabled: true
+  - name: JereKuusela-Server_devcommands
+    version:
+      major: 1
+      minor: 115
+      patch: 0
+    enabled: true
+  - name: Advize-PlantEasily
+    version:
+      major: 2
+      minor: 3
+      patch: 0
+    enabled: true
+  - name: ishid4-BetterArchery
+    version:
+      major: 2
+      minor: 0
+      patch: 5
+    enabled: true
+  - name: Goldenrevolver-Quick_Stack_Store_Sort_Trash_Restock
+    version:
+      major: 1
+      minor: 4
+      patch: 16
+    enabled: true
+  - name: ValheimModding-YamlDotNet
+    version:
+      major: 16
+      minor: 3
+      patch: 1
+    enabled: true
+  - name: shudnal-ConditionalConfigSync
+    version:
+      major: 1
+      minor: 0
+      patch: 11
+    enabled: true
+  - name: shudnal-ExtraSlots
+    version:
+      major: 1
+      minor: 2
+      patch: 21
+    enabled: true
+  - name: ValheimModding-JsonDotNET
+    version:
+      major: 13
+      minor: 0
+      patch: 4
+    enabled: true
+  - name: OdinPlus-OdinsKingdom
+    version:
+      major: 1
+      minor: 6
+      patch: 3
+    enabled: true
+  - name: nearbear-BiggerBoatMapExploreRadius
+    version:
+      major: 1
+      minor: 0
+      patch: 3
+    enabled: true
+  - name: Searica-CameraTweaks
+    version:
+      major: 1
+      minor: 4
+      patch: 1
+    enabled: true
+  - name: ValheimModding-Jotunn
+    version:
+      major: 2
+      minor: 30
+      patch: 2
+    enabled: true
+  - name: OdinPlus-OdinArchitect
+    version:
+      major: 1
+      minor: 8
+      patch: 8
+    enabled: true
+  - name: OdinPlus-QuickTeleport
+    version:
+      major: 2
+      minor: 0
+      patch: 7
+    enabled: true
+  - name: RandyKnapp-EpicLoot
+    version:
+      major: 0
+      minor: 14
+      patch: 13
+    enabled: true
+  - name: Therzie-Warfare
+    version:
+      major: 1
+      minor: 9
+      patch: 5
+    enabled: true
+  - name: Vapok-AdventureBackpacks
+    version:
+      major: 2
+      minor: 4
+      patch: 4
+    enabled: true
+  - name: Therzie-Monstrum
+    version:
+      major: 1
+      minor: 6
+      patch: 1
+    enabled: true
+  - name: Therzie-Armory
+    version:
+      major: 1
+      minor: 4
+      patch: 3
+    enabled: true
+  - name: Therzie-Wizardry
+    version:
+      major: 1
+      minor: 2
+      patch: 3
+    enabled: true
+  - name: blacks7ar-VikingsDoSwim
+    version:
+      major: 1
+      minor: 4
+      patch: 2
+    enabled: true
+  - name: TastyChickenLegs-AutomaticFuel
+    version:
+      major: 1
+      minor: 5
+      patch: 7
+    enabled: true
+  - name: RockerKitten-BoneAppetit
+    version:
+      major: 3
+      minor: 4
+      patch: 0
+    enabled: true
+  - name: shudnal-MyLittleUI
+    version:
+      major: 1
+      minor: 2
+      patch: 31
+    enabled: true
+  - name: shudnal-HipLantern
+    version:
+      major: 1
+      minor: 1
+      patch: 14
+    enabled: true
+  - name: Marlthon-SeaAnimals
+    version:
+      major: 0
+      minor: 3
+      patch: 9
+    enabled: true
+  - name: blacks7ar-OreMines
+    version:
+      major: 1
+      minor: 2
+      patch: 1
+    enabled: true
+  - name: cybrp-ItemDrawers
+    version:
+      major: 1
+      minor: 2
+      patch: 6
+    enabled: true
+  - name: MidnightMods-AchievementEnabler
+    version:
+      major: 0
+      minor: 5
+      patch: 1
+    enabled: true
+  - name: M2Valheim-SkillsReworked
+    version:
+      major: 2
+      minor: 2
+      patch: 0
+    enabled: true
+  - name: M2Valheim-TalentTree
+    version:
+      major: 2
+      minor: 3
+      patch: 5
+    enabled: true
+  - name: FRS-SailingTogether
+    version:
+      major: 1
+      minor: 0
+      patch: 0
+    enabled: true
+  - name: Stonaar-ValheimBuildCamera
+    version:
+      major: 1
+      minor: 13
+      patch: 0
+    enabled: true
+  - name: MSchmoecker-MultiUserChest
+    version:
+      major: 0
+      minor: 6
+      patch: 2
+    enabled: true
+  - name: Nextek-SpeedyPaths
+    version:
+      major: 1
+      minor: 0
+      patch: 9
+    enabled: true
+  - name: SpikeHimself-XPortal
+    version:
+      major: 1
+      minor: 2
+      patch: 26
+    enabled: true
+  - name: OhhLoz-HoneyPlus
+    version:
+      major: 6
+      minor: 1
+      patch: 0
+    enabled: true
+  - name: Marlthon-OdinShip
+    version:
+      major: 0
+      minor: 8
+      patch: 7
+    enabled: true
+  - name: JoelOliMclean-NoRainDamage
+    version:
+      major: 1
+      minor: 3
+      patch: 2
+    enabled: true
+  - name: Neobotics-HUDCompass
+    version:
+      major: 1
+      minor: 2
+      patch: 1
+    enabled: true
