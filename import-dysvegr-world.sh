@@ -93,7 +93,7 @@ PREVIOUS="$BACKUP_ROOT/Dysvegr-previous-$STAMP"
 cleanup() {
   rc=$?
   trap - EXIT
-  if (( rc != 0 && STOPPED == 1 )); then
+  if (( rc != 0 && ( OLD_MOVED == 1 || NEW_ACTIVE == 1 ) )); then
     echo '[Dysvegr] Import failed: attempting to restore the previous world.' >&2
     if (( NEW_ACTIVE == 1 )) && [[ -d "$WORLD_ROOT/Dysvegr" ]]; then
       mv "$WORLD_ROOT/Dysvegr" "$BACKUP_ROOT/Dysvegr-failed-import-$STAMP" || true
