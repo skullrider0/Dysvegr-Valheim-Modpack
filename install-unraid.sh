@@ -114,129 +114,25 @@ while IFS=$'\t' read -r package version mode; do
   echo "[Dysvegr] Downloading $package $version"
   curl -fL --retry 3 --connect-timeout 20 --max-time 240 -sS "$url" -o "$file"
   unzip -tqq "$file" >/dev/null || { echo "Invalid download: $url" >&2; exit 1; }
-  # Normalize Windows-style separators for the traversal check. Info-ZIP also
-  # converts them during extraction for certain ZIP platform flags.
+  # Treat Windows backslashes as separators when checking archive paths.
   if unzip -Z1 "$file" | tr '\\' '/' | grep -qE '(^/|(^|/)\.\.(/|$)|^[A-Za-z]:)'; then
     echo "Archive contains unsafe paths: $package" >&2; exit 1
   fi
   mkdir -p "$STAGE/extracted/$package"
-  # Some valid Thunderstore packages (notably Jotunn 2.30.2) were created
-  # with Windows path separators. Info-ZIP extracts them successfully, but
-  # exits with status 1 for the separator warning. Only tolerate that exact
-  # one-line warning; keep every other extraction error fatal.
+  # Windows-created ZIPs can extract correctly but return status 1 for a
+  # harmless Info-ZIP backslash warning. Accept ONLY that one warning.
   extract_rc=0
   extract_log="$(unzip -q "$file" -d "$STAGE/extracted/$package" 2>&1)" || extract_rc=$?
   if (( extract_rc != 0 )); then
     if (( extract_rc == 1 )) &&
-       [[ "$extract_log" == *"appears to use backslashes as path separators"* ]] &&
-       [[ "$extract_log" != *
-done < "$MANIFEST"
-echo "[Dysvegr] Validated $count package ZIPs"
-
-if [[ "$WAS_RUNNING" == true ]]; then
-  echo '[Dysvegr] Stopping Valheim for backup and installation'
-  docker stop -t 120 "$CONTAINER"
-  STOPPED=1
-fi
-
-BACKUP_DIR="$(dirname "$GAME_DIR")/Dysvegr-modpack-backups"
-mkdir -p "$BACKUP_DIR"
-BACKUP="$BACKUP_DIR/Valheim-BepInEx-before-Dysvegr-$(date -u +%Y%m%dT%H%M%SZ).tar.gz"
-tar -czf "$BACKUP" -C "$GAME_DIR" BepInEx
-echo "[Dysvegr] BepInEx backup saved at $BACKUP"
-
-DEST_PLUGINS="$GAME_DIR/BepInEx/plugins"
-DEST_PATCHERS="$GAME_DIR/BepInEx/patchers"
-DEST_CONFIG="$GAME_DIR/BepInEx/config"
-mkdir -p "$DEST_PLUGINS" "$DEST_PATCHERS" "$DEST_CONFIG"
-
-while IFS=$'\t' read -r package version mode; do
-  [[ -z "$package" || "$package" == \#* ]] && continue
-  [[ "$mode" == framework ]] && continue
-  [[ "$mode" == client && $INSTALL_CLIENT -eq 0 ]] && continue
-  folder="$STAGE/extracted/$package"
-  if [[ -d "$folder/BepInEx/plugins" ]]; then
-    cp -a "$folder/BepInEx/plugins/." "$DEST_PLUGINS/"
-  elif [[ -d "$folder/plugins" ]]; then
-    cp -a "$folder/plugins/." "$DEST_PLUGINS/"
-  else
-    target="$DEST_PLUGINS/$package"
-    mkdir -p "$target"
-    find "$folder" -maxdepth 1 -type f \
-      ! -name manifest.json ! -name icon.png \
-      ! -iname 'readme*' ! -iname 'changelog*' ! -iname 'license*' \
-      -exec cp -a -t "$target" {} +
-    for sub in Assets assets Resources resources; do
-      if [[ -d "$folder/$sub" ]]; then cp -a "$folder/$sub" "$target/"; fi
-    done
-    if ! find "$target" -type f \( -iname '*.dll' -o -iname '*.so' \) -print -quit | grep -q .; then
-      echo "[Dysvegr] WARNING: no normal plugin binary detected for $package" >&2
-    fi
-  fi
-  if [[ -d "$folder/BepInEx/patchers" ]]; then
-    cp -a "$folder/BepInEx/patchers/." "$DEST_PATCHERS/"
-  fi
-  if [[ -d "$folder/BepInEx/config" ]]; then
-    cp -an "$folder/BepInEx/config/." "$DEST_CONFIG/"
-  fi
-  if [[ -d "$folder/config" ]]; then
-    cp -an "$folder/config/." "$DEST_CONFIG/"
-  fi
-  echo "[Dysvegr] Installed $package $version"
-done < "$MANIFEST"
-
-# Optional exported settings from the ChatGPT downloadable bundle.
-if [[ -f "$ROOT/server-configs.zip" ]]; then
-  mkdir -p "$STAGE/config"
-  unzip -tqq "$ROOT/server-configs.zip" >/dev/null
-  unzip -qq "$ROOT/server-configs.zip" -d "$STAGE/config"
-  while IFS= read -r -d '' src; do
-    rel="${src#"$STAGE/config/"}"
-    target="$DEST_CONFIG/$rel"
-    mkdir -p "$(dirname "$target")"
-    [[ -e "$target" ]] || cp -a "$src" "$target"
-  done < <(find "$STAGE/config" -type f -print0)
-  echo '[Dysvegr] Added missing exported config files'
-fi
-
-if [[ $WITH_WORLD -eq 1 ]]; then
-  mkdir -p "$STAGE/world"
-  unzip -tqq "$ROOT/world-Dysvegr.zip" >/dev/null
-  unzip -qq "$ROOT/world-Dysvegr.zip" -d "$STAGE/world"
-  [[ -f "$STAGE/world/Dysvegr/_main.62.ok" &&
-     -f "$STAGE/world/Dysvegr/_main.62.db2" &&
-     -f "$STAGE/world/Dysvegr/_main.62.fwl2" ]] ||
-    { echo 'World archive missing expected files. Nothing imported.' >&2; exit 1; }
-  [[ ! -e "$WORLD_ROOT/Dysvegr" ]] ||
-    { echo 'Dysvegr world appeared during install; refusing to overwrite.' >&2; exit 1; }
-  cp -a "$STAGE/world/Dysvegr" "$WORLD_ROOT/Dysvegr"
-  echo "[Dysvegr] World imported to $WORLD_ROOT/Dysvegr"
-fi
-
-UID_DOCKER="$(docker inspect -f '{{range .Config.Env}}{{println .}}{{end}}' "$CONTAINER" |
-  grep '^UID=' | tail -1 | cut -d= -f2 || true)"
-GID_DOCKER="$(docker inspect -f '{{range .Config.Env}}{{println .}}{{end}}' "$CONTAINER" |
-  grep '^GID=' | tail -1 | cut -d= -f2 || true)"
-if [[ "${UID_DOCKER:-}" =~ ^[0-9]+$ && "${GID_DOCKER:-}" =~ ^[0-9]+$ ]]; then
-  chown -R "$UID_DOCKER:$GID_DOCKER" "$DEST_PLUGINS" "$DEST_PATCHERS" "$DEST_CONFIG"
-  if [[ $WITH_WORLD -eq 1 ]]; then chown -R "$UID_DOCKER:$GID_DOCKER" "$WORLD_ROOT/Dysvegr"; fi
-fi
-
-echo "[Dysvegr] SUCCESS: installed $count package archives; backup: $BACKUP"
-if [[ $WITH_WORLD -eq 1 ]]; then
-  echo 'Set World Name = Dysvegr in your Unraid Docker template if it is not already set.'
-fi
-if [[ "$WAS_RUNNING" == true ]]; then
-  echo '[Dysvegr] Container will restart; inspect docker logs for plugin errors.'
-fi
-\n'* ]]; then
+       [[ "$extract_log" == warning:*" appears to use backslashes as path separators" ]] &&
+       [[ "$extract_log" != *$'\n'* ]]; then
       echo "[Dysvegr] ZIP separator warning accepted: $package"
     else
       echo "Extraction failed for $package (exit $extract_rc): $extract_log" >&2
       exit 1
     fi
   fi
-  # Refuse to proceed if a package yielded no files.
   if ! find "$STAGE/extracted/$package" -type f -print -quit | grep -q .; then
     echo "Archive extracted no files: $package" >&2; exit 1
   fi
