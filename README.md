@@ -44,6 +44,46 @@ cd /mnt/user/appdata/Dysvegr-Valheim-Modpack && git pull --ff-only && bash insta
 
 Each player must update their Thunderstore/r2modman profile and **disable or uninstall MultiUserChest** before joining. VikingQoL 1.4.0 must be present on the server and all clients. The original uploaded `.r2z` is unchanged; `client-profile.yml` in GitHub reflects the corrected 43-package profile.
 
+## Automatic Thunderstore version checks and manual updates
+
+The modpack includes a **read-only checker**. It uses Thunderstore's package metadata API to compare new releases with the versions selected for Dysvegr. The check never stops Valheim, edits plugin files, or silently installs updates. The launcher supports host Python3 and, if missing, Docker's temporary `python:3.12-alpine` image.
+
+**Check now (server and client packages):**
+
+```bash
+cd /mnt/user/appdata/Dysvegr-Valheim-Modpack
+git pull --ff-only
+bash update-mods.sh check
+```
+
+**Set up daily checks:** (Requires Unraid's **User Scripts** plugin.)
+
+```bash
+bash /mnt/user/appdata/Dysvegr-Valheim-Modpack/setup-daily-check.sh
+```
+
+Then go to **Unraid Settings → User Scripts → DysvegrModUpdateCheck**, set **Schedule: Daily** and click **Apply**. The plugin retains the script on the Unraid flash drive across reboots. Only checks run daily; you decide when to restart the server.
+
+Read the latest report:
+
+```bash
+cat /mnt/user/appdata/Dysvegr-Valheim-Modpack/.dysvegr-updates/latest-report.txt
+```
+
+**Apply newer versions on demand:**
+
+```bash
+cd /mnt/user/appdata/Dysvegr-Valheim-Modpack
+git pull --ff-only
+bash update-mods.sh update
+```
+
+The command performs a fresh check of server mods only, validates new dependencies, shows exact proposed versions and asks you to type `UPDATE`. Upon confirmation, the installer downloads every selected package and validates ZIPs, stops the container, backs up BepInEx and any accessible worlds, quarantines old package directories, installs, and restarts Valheim. Successful approved versions are stored in untracked `mods.local.tsv`, avoiding Git conflicts/downgrades. The GitHub `mods.tsv` remains the curated default. Use `bash update-mods.sh update --yes` **only** if you understand the downtime, backup and mod compatibility risk.
+
+**Always update joining players' matching multiplayer mods** using Thunderstore/r2modman before reconnecting. The script cannot automatically update players' game installations or guarantee new versions are compatible. No Food Degradation and FirstPerson are client-only; ich777 manages BepInEx itself. The checker refuses a failed/incomplete API lookup or unknown new dependency instead of installing an uncertain update.
+
+A report can be checked anytime even if the User Scripts scheduling option has not been enabled.
+
 ## Server setup
 
 1. In the Unraid Docker template for the ich777 **Valheim** container, set **Enable BepInEx** to enabled, apply the change, and start the container once.
