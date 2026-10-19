@@ -225,6 +225,7 @@ def main():
                 print("BLOCKED: " + error, file=sys.stderr)
             raise RuntimeError("Dependency changes need manual review; nothing will be installed.")
         atomic_text(CACHE / "pending-mods.tsv", serialize_manifest(candidate))
+        atomic_text(CACHE / "current-mods.tsv", serialize_manifest(installed))
         print(f"Prepared {count_server} server updates for review. No installed files were changed.")
 
 if __name__ == "__main__":
