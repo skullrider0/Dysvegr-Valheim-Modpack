@@ -1,3 +1,30 @@
+## Unraid cache disk checker and cleanup
+
+The optional [disk-cleanup-unraid.sh](./disk-cleanup-unraid.sh) script checks space on the cache pool, reports large directories and offers two *explicit* cleanup operations. **Dry-run preview is the default**; the script does not install a scheduled destructive task.
+
+```bash
+cd /mnt/user/appdata/Dysvegr-Valheim-Modpack
+git pull --ff-only
+bash -n disk-cleanup-unraid.sh
+bash disk-cleanup-unraid.sh
+```
+
+The preview lists older *date-stamped* backup sets from clearly named backup folders directly under `/mnt/cache/appdata` and `/mnt/cache/backup(s)`. It preserves the latest item **in each backup naming family**, never just one backup across all services. Files with ambiguous or undated names are not automatically deleted. It also lists unmounted appdata directories which *could* belong to removed containers. Docker's current **and stopped** container bind mounts are protected, and saved Docker templates protect additional directories unless an extra override is requested. Active Docker data, `/mnt/cache/system`, named Docker volumes, and the existing Dysvegr world are excluded.
+
+**After reviewing the paths:**
+
+```bash
+bash disk-cleanup-unraid.sh --apply
+```
+
+This prompts before deleting old dated backups. For both old dated backups **and orphan candidates**, use:
+
+```bash
+bash disk-cleanup-unraid.sh --apply --purge-orphans
+```
+
+This requires typing `DELETE BACKUPS AND ORPHANS` interactively and irreversibly deletes the listed unmounted appdata folders. Those might contain valuable old game worlds, so ideally archive or move them to your array instead of deleting. Use `--include-template-orphans` only when you have confirmed saved Docker templates are no longer needed. The script does **not** shrink or delete Docker's image file or automatically clean the `system` share. Inspect `docker system df -v` separately for Docker image usage. There is no parity disk in the current Unraid setup; ensure you have independent backups.
+
 # Dysvegr Valheim Modpack
 
 Version-pinned Thunderstore modpack for an **ich777 Valheim Docker server on Unraid**, assembled from the uploaded Thunderstore/r2modman profile.
