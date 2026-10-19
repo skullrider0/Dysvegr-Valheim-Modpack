@@ -4,8 +4,6 @@
 set -Eeuo pipefail
 IFS=$'\n\t'
 ROOT="$(cd -- "$(dirname -- "${BASH_SOURCE[0]}")" && pwd -P)"
-# Prefer the last successfully approved update, unless the caller provides
-# a validated temporary manifest (update-mods.sh).
 if [[ -n "${DYSG_MANIFEST:-}" ]]; then
   MANIFEST="$DYSG_MANIFEST"
 elif [[ -f "$ROOT/mods.local.tsv" ]]; then
@@ -204,86 +202,7 @@ if [[ -n "${DYSG_OLD_MANIFEST:-}" ]]; then
   [[ -f "$DYSG_OLD_MANIFEST" ]] || {
     echo "Missing old manifest $DYSG_OLD_MANIFEST" >&2; exit 1;
   }
-  while IFS=
-  [[ -z "$package" || "$package" == \#* ]] && continue
-  [[ "$mode" == framework ]] && continue
-  [[ "$mode" == client && $INSTALL_CLIENT -eq 0 ]] && continue
-  folder="$STAGE/extracted/$package"
-  if [[ -d "$folder/BepInEx/plugins" ]]; then
-    cp -a "$folder/BepInEx/plugins/." "$DEST_PLUGINS/"
-  elif [[ -d "$folder/plugins" ]]; then
-    cp -a "$folder/plugins/." "$DEST_PLUGINS/"
-  else
-    target="$DEST_PLUGINS/$package"
-    mkdir -p "$target"
-    # Many Thunderstore packages (including BetterArchery) store their DLL
-    # inside a nested directory rather than at the ZIP root. Preserve those
-    # directories; BepInEx recursively scans plugins for DLLs.
-    find "$folder" -mindepth 1 -maxdepth 1 \
-      ! -name manifest.json ! -name icon.png \
-      ! -iname 'readme*' ! -iname 'changelog*' ! -iname 'license*' \
-      -exec cp -a -t "$target" {} +
-    if ! find "$target" -type f \( -iname '*.dll' -o -iname '*.so' \) -print -quit | grep -q .; then
-      echo "[Dysvegr] WARNING: no plugin binary detected anywhere in $package" >&2
-    fi
-  fi
-  if [[ -d "$folder/BepInEx/patchers" ]]; then
-    cp -a "$folder/BepInEx/patchers/." "$DEST_PATCHERS/"
-  fi
-  if [[ -d "$folder/BepInEx/config" ]]; then
-    cp -an "$folder/BepInEx/config/." "$DEST_CONFIG/"
-  fi
-  if [[ -d "$folder/config" ]]; then
-    cp -an "$folder/config/." "$DEST_CONFIG/"
-  fi
-  echo "[Dysvegr] Installed $package $version"
-done < "$MANIFEST"
-
-# Optional exported settings from the ChatGPT downloadable bundle.
-if [[ -f "$ROOT/server-configs.zip" ]]; then
-  mkdir -p "$STAGE/config"
-  unzip -tqq "$ROOT/server-configs.zip" >/dev/null
-  unzip -qq "$ROOT/server-configs.zip" -d "$STAGE/config"
-  while IFS= read -r -d '' src; do
-    rel="${src#"$STAGE/config/"}"
-    target="$DEST_CONFIG/$rel"
-    mkdir -p "$(dirname "$target")"
-    [[ -e "$target" ]] || cp -a "$src" "$target"
-  done < <(find "$STAGE/config" -type f -print0)
-  echo '[Dysvegr] Added missing exported config files'
-fi
-
-if [[ $WITH_WORLD -eq 1 ]]; then
-  mkdir -p "$STAGE/world"
-  unzip -tqq "$ROOT/world-Dysvegr.zip" >/dev/null
-  unzip -qq "$ROOT/world-Dysvegr.zip" -d "$STAGE/world"
-  [[ -f "$STAGE/world/Dysvegr/_main.62.ok" &&
-     -f "$STAGE/world/Dysvegr/_main.62.db2" &&
-     -f "$STAGE/world/Dysvegr/_main.62.fwl2" ]] ||
-    { echo 'World archive missing expected files. Nothing imported.' >&2; exit 1; }
-  [[ ! -e "$WORLD_ROOT/Dysvegr" ]] ||
-    { echo 'Dysvegr world appeared during install; refusing to overwrite.' >&2; exit 1; }
-  cp -a "$STAGE/world/Dysvegr" "$WORLD_ROOT/Dysvegr"
-  echo "[Dysvegr] World imported to $WORLD_ROOT/Dysvegr"
-fi
-
-UID_DOCKER="$(docker inspect -f '{{range .Config.Env}}{{println .}}{{end}}' "$CONTAINER" |
-  grep '^UID=' | tail -1 | cut -d= -f2 || true)"
-GID_DOCKER="$(docker inspect -f '{{range .Config.Env}}{{println .}}{{end}}' "$CONTAINER" |
-  grep '^GID=' | tail -1 | cut -d= -f2 || true)"
-if [[ "${UID_DOCKER:-}" =~ ^[0-9]+$ && "${GID_DOCKER:-}" =~ ^[0-9]+$ ]]; then
-  chown -R "$UID_DOCKER:$GID_DOCKER" "$DEST_PLUGINS" "$DEST_PATCHERS" "$DEST_CONFIG"
-  if [[ $WITH_WORLD -eq 1 ]]; then chown -R "$UID_DOCKER:$GID_DOCKER" "$WORLD_ROOT/Dysvegr"; fi
-fi
-
-echo "[Dysvegr] SUCCESS: installed $count package archives; backup: $BACKUP"
-if [[ $WITH_WORLD -eq 1 ]]; then
-  echo 'Set World Name = Dysvegr in your Unraid Docker template if it is not already set.'
-fi
-if [[ "$WAS_RUNNING" == true ]]; then
-  echo '[Dysvegr] Container will restart; inspect docker logs for plugin errors.'
-fi
-\t' read -r package version mode; do
+  while IFS=$'\t' read -r package version mode; do
     [[ -z "$package" || "$package" == \#* || "$mode" != server ]] && continue
     old_version="$(awk -F '\t' -v pkg="$package" '$1 == pkg { print $2; exit }' "$DYSG_OLD_MANIFEST")"
     [[ -n "$old_version" && "$old_version" != "$version" ]] || continue
@@ -301,86 +220,7 @@ fi
   done < "$MANIFEST"
 fi
 
-while IFS=
-  [[ -z "$package" || "$package" == \#* ]] && continue
-  [[ "$mode" == framework ]] && continue
-  [[ "$mode" == client && $INSTALL_CLIENT -eq 0 ]] && continue
-  folder="$STAGE/extracted/$package"
-  if [[ -d "$folder/BepInEx/plugins" ]]; then
-    cp -a "$folder/BepInEx/plugins/." "$DEST_PLUGINS/"
-  elif [[ -d "$folder/plugins" ]]; then
-    cp -a "$folder/plugins/." "$DEST_PLUGINS/"
-  else
-    target="$DEST_PLUGINS/$package"
-    mkdir -p "$target"
-    # Many Thunderstore packages (including BetterArchery) store their DLL
-    # inside a nested directory rather than at the ZIP root. Preserve those
-    # directories; BepInEx recursively scans plugins for DLLs.
-    find "$folder" -mindepth 1 -maxdepth 1 \
-      ! -name manifest.json ! -name icon.png \
-      ! -iname 'readme*' ! -iname 'changelog*' ! -iname 'license*' \
-      -exec cp -a -t "$target" {} +
-    if ! find "$target" -type f \( -iname '*.dll' -o -iname '*.so' \) -print -quit | grep -q .; then
-      echo "[Dysvegr] WARNING: no plugin binary detected anywhere in $package" >&2
-    fi
-  fi
-  if [[ -d "$folder/BepInEx/patchers" ]]; then
-    cp -a "$folder/BepInEx/patchers/." "$DEST_PATCHERS/"
-  fi
-  if [[ -d "$folder/BepInEx/config" ]]; then
-    cp -an "$folder/BepInEx/config/." "$DEST_CONFIG/"
-  fi
-  if [[ -d "$folder/config" ]]; then
-    cp -an "$folder/config/." "$DEST_CONFIG/"
-  fi
-  echo "[Dysvegr] Installed $package $version"
-done < "$MANIFEST"
-
-# Optional exported settings from the ChatGPT downloadable bundle.
-if [[ -f "$ROOT/server-configs.zip" ]]; then
-  mkdir -p "$STAGE/config"
-  unzip -tqq "$ROOT/server-configs.zip" >/dev/null
-  unzip -qq "$ROOT/server-configs.zip" -d "$STAGE/config"
-  while IFS= read -r -d '' src; do
-    rel="${src#"$STAGE/config/"}"
-    target="$DEST_CONFIG/$rel"
-    mkdir -p "$(dirname "$target")"
-    [[ -e "$target" ]] || cp -a "$src" "$target"
-  done < <(find "$STAGE/config" -type f -print0)
-  echo '[Dysvegr] Added missing exported config files'
-fi
-
-if [[ $WITH_WORLD -eq 1 ]]; then
-  mkdir -p "$STAGE/world"
-  unzip -tqq "$ROOT/world-Dysvegr.zip" >/dev/null
-  unzip -qq "$ROOT/world-Dysvegr.zip" -d "$STAGE/world"
-  [[ -f "$STAGE/world/Dysvegr/_main.62.ok" &&
-     -f "$STAGE/world/Dysvegr/_main.62.db2" &&
-     -f "$STAGE/world/Dysvegr/_main.62.fwl2" ]] ||
-    { echo 'World archive missing expected files. Nothing imported.' >&2; exit 1; }
-  [[ ! -e "$WORLD_ROOT/Dysvegr" ]] ||
-    { echo 'Dysvegr world appeared during install; refusing to overwrite.' >&2; exit 1; }
-  cp -a "$STAGE/world/Dysvegr" "$WORLD_ROOT/Dysvegr"
-  echo "[Dysvegr] World imported to $WORLD_ROOT/Dysvegr"
-fi
-
-UID_DOCKER="$(docker inspect -f '{{range .Config.Env}}{{println .}}{{end}}' "$CONTAINER" |
-  grep '^UID=' | tail -1 | cut -d= -f2 || true)"
-GID_DOCKER="$(docker inspect -f '{{range .Config.Env}}{{println .}}{{end}}' "$CONTAINER" |
-  grep '^GID=' | tail -1 | cut -d= -f2 || true)"
-if [[ "${UID_DOCKER:-}" =~ ^[0-9]+$ && "${GID_DOCKER:-}" =~ ^[0-9]+$ ]]; then
-  chown -R "$UID_DOCKER:$GID_DOCKER" "$DEST_PLUGINS" "$DEST_PATCHERS" "$DEST_CONFIG"
-  if [[ $WITH_WORLD -eq 1 ]]; then chown -R "$UID_DOCKER:$GID_DOCKER" "$WORLD_ROOT/Dysvegr"; fi
-fi
-
-echo "[Dysvegr] SUCCESS: installed $count package archives; backup: $BACKUP"
-if [[ $WITH_WORLD -eq 1 ]]; then
-  echo 'Set World Name = Dysvegr in your Unraid Docker template if it is not already set.'
-fi
-if [[ "$WAS_RUNNING" == true ]]; then
-  echo '[Dysvegr] Container will restart; inspect docker logs for plugin errors.'
-fi
-\t' read -r package version mode; do
+while IFS=$'\t' read -r package version mode; do
   [[ -z "$package" || "$package" == \#* ]] && continue
   [[ "$mode" == framework ]] && continue
   [[ "$mode" == client && $INSTALL_CLIENT -eq 0 ]] && continue
