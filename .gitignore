@@ -3,3 +3,6 @@ Dysvegr-Valheim-Modpack.zip
 *.rar
 *.log
 .dysvegr-stage.*
+.dysvegr-updates/
+mods.local.tsv
+mods.local.tsv.tmp
