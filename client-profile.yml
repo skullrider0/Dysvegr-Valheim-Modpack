@@ -84,6 +84,12 @@ mods:
       minor: 30
       patch: 2
     enabled: true
+  - name: Digitalroot-Eternal_Fire
+    version:
+      major: 1
+      minor: 1
+      patch: 10
+    enabled: true
   - name: OdinPlus-OdinArchitect
     version:
       major: 1
@@ -161,12 +167,6 @@ mods:
       major: 1
       minor: 1
       patch: 14
-    enabled: true
-  - name: Marlthon-SeaAnimals
-    version:
-      major: 0
-      minor: 3
-      patch: 9
     enabled: true
   - name: blacks7ar-OreMines
     version:
