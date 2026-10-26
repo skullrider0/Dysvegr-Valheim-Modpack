@@ -94,6 +94,12 @@
       "enabled": true
     },
     {
+      "package_id": "Digitalroot-Eternal_Fire",
+      "version": "1.1.10",
+      "mode": "server",
+      "enabled": true
+    },
+    {
       "package_id": "OdinPlus-OdinArchitect",
       "version": "1.8.8",
       "mode": "server",
@@ -168,12 +174,6 @@
     {
       "package_id": "shudnal-HipLantern",
       "version": "1.1.14",
-      "mode": "server",
-      "enabled": true
-    },
-    {
-      "package_id": "Marlthon-SeaAnimals",
-      "version": "0.3.9",
       "mode": "server",
       "enabled": true
     },
@@ -268,6 +268,6 @@
       "enabled": true
     }
   ],
-  "notes": "Derived from Mods_1792350318316.r2z with MultiUserChest intentionally removed due to incompatibility with VikingQoL 1.4.0 (the latter provides shared-chest support). Original uploaded export had 44 entries; compatible distribution includes 43. ItemDrawers is also omitted following previous TypeLoadException; all players must remove MultiUserChest and use matching VikingQoL 1.4.0. FirstPerson is client-only. No Food Degradation 1.0.0 restricted to valheim.exe by BepInEx process filter and therefore client-only; server safely skips any previously installed copy. Latest user startup logs showed VikingQoL 1.4.0 initialized with no remaining MultiUserChest conflict.",
+  "notes": "Derived from Mods_1792350318316.r2z with MultiUserChest intentionally removed due to incompatibility with VikingQoL 1.4.0 (the latter provides shared-chest support). Original uploaded export had 44 entries; compatible distribution includes 43. ItemDrawers is also omitted following previous TypeLoadException; all players must remove MultiUserChest and use matching VikingQoL 1.4.0. FirstPerson is client-only. No Food Degradation 1.0.0 restricted to valheim.exe by BepInEx process filter and therefore client-only; server safely skips any previously installed copy. Latest user startup logs showed VikingQoL 1.4.0 initialized with no remaining MultiUserChest conflict. SeaAnimals 0.3.9 removed from the curated server and client profile on October 24, 2026; Digitalroot Eternal Fire 1.1.10 added October 25, 2026.",
   "source_profile_name": "Mods"
 }
