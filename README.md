@@ -34,6 +34,12 @@ Version-pinned Thunderstore modpack for an **ich777 Valheim Docker server on Unr
 - Package versions in [mods.tsv](mods.tsv)
 - The script **downloads mod ZIPs directly from Thunderstore**; it doesn't redistribute mod DLLs.
 
+## October 25, 2026 — Eternal Fire added
+
+- Added `Digitalroot-Eternal_Fire-1.1.10` to the server and client manifests. It keeps fireplaces and other configured fuel-consuming devices burning without refueling. Dependencies BepInEx and Jotunn are already included.
+- Removed `Marlthon-SeaAnimals` from both manifests. Existing plugin files must still be disabled or removed separately; updating the Git checkout alone does not uninstall them.
+- The Unraid installer uses the locally approved `mods.local.tsv` when it exists. Add the Eternal Fire server row to that local file before running `bash install-unraid.sh --mods-only`; the update checker does not automatically install a newly added package already pinned to its latest version.
+
 ## October 18, 2026 modpack update
 
 Rebuilt the pinned manifest and client profile from `Mods_1792350318316.r2z`, which contains **44 enabled packages**. The compatible distribution has **43** because VikingQoL replaces MultiUserChest:
